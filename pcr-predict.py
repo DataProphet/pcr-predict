@@ -39,6 +39,7 @@ import subprocess
 import typing
 import gzip
 import re
+import sys
 import logging
 import tempfile
 import platform
@@ -311,16 +312,19 @@ def get_args() -> argparse.Namespace:
 
     # set up the arg parser with formatter to print defaults in help
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=__doc__,
     )
-
-    # TODO add arguments for output formats, etc.
 
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        # ensure logs are written to stderr (default)
+        stream=sys.stderr,
+        level=logging.INFO,
+    )
 
     args = get_args()
 
@@ -363,14 +367,12 @@ if __name__ == "__main__":
         # value
         if index in PCR_PREDICTORS:
             # predict the value
-            digests[index] = PCR_PREDICTORS[index](event_log)
+            digests[index] = PCR_PREDICTORS[index](event_log).hex()
         else:
             # cannot be predicted, just use current value
-            digests[index] = get_current_pcr_value(index)
+            digests[index] = get_current_pcr_value(index).hex()
 
         logging.info("PCR%d : %s", index, digests[index])
 
     # print the predicted digests
-    # TODO this needs to be cleaned up so that logging/printing the digests don't
-    # interfere with each other
-    print(json.dumps(digests))
+    print(json.dumps(digests, indent=2))
