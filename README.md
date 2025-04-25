@@ -9,7 +9,7 @@ after a kernel or initramfs upgrade by resealing secrets to the predicted PCR
 values.
 
 While systemd-boot natively supports resealing secrets to next-boot PCR values,
-if you're using Grub there's very few options to try and perform the next-boot
+if you're using Grub there's very few options to try and predict the next-boot
 PCR values.
 
 ## Features
